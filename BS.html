@@ -37,29 +37,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script>
-    (function () {
-      const isStandalone =
-        window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true || // iOS
-        document.referrer.startsWith('android-app://'); // Android
+(async function () {
+  let isInstalled = false;
 
-      if (!isStandalone) {
-        // Not running in installed PWA
-        location.replace('/online/install-app');
-      } else {
-        // In PWA context — open Google Meet in new tab
-        const link = document.createElement('a');
-        link.href = 'https://meet.google.com/ffp-craj-bhk';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
+  // Detect if page is running inside a PWA window
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true || // iOS
+    document.referrer.startsWith('android-app://'); // Android
 
-        // Optionally go back after short delay
-        setTimeout(() => history.back(), 500);
-      }
-    })();
-  </script>
+  if (isStandalone) {
+    isInstalled = true;
+  }
+
+  // If not running in standalone, check if the app is installed using getInstalledRelatedApps
+  if (!isInstalled && 'getInstalledRelatedApps' in navigator) {
+    try {
+      const apps = await navigator.getInstalledRelatedApps();
+      isInstalled = apps.some(app =>
+        app.platform === 'webapp' &&
+        app.url.includes('/church/app/manifest.json') // adjust path if needed
+      );
+    } catch (e) {
+      console.warn('Related apps check failed:', e);
+    }
+  }
+
+  if (isInstalled) {
+    // App is installed — open Google Meet in a new tab
+    const link = document.createElement('a');
+    link.href = 'https://meet.google.com/ffp-craj-bhk';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+
+    // Optionally return to previous page after short delay
+    setTimeout(() => history.back(), 500);
+  } else {
+    // App is not installed — redirect to install instructions
+    location.replace('/online/install-app');
+  }
+})();
+</script>
 </head>
 <body></body>
 </html>
