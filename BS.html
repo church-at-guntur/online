@@ -41,7 +41,7 @@
     (function () {
       const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || document.referrer.startsWith('android-app://');
       if (!isInstalled) {
-        location.replace('/church/install-app');
+        location.replace('/online/install-app');
       } else {
         window.open('https://meet.google.com/ffp-craj-bhk', '_blank');
         history.back();
