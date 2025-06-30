@@ -39,12 +39,10 @@
   <!-- Fast redirect logic -->
   <script>
     (function () {
-      const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
-                          navigator.standalone === true ||
-                          document.referrer.startsWith('android-app://');
-
+      const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || document.referrer.startsWith('android-app://');
       if (isInstalled) {
-        location.replace('https://meet.google.com/ffp-craj-bhk');
+        window.open('https://meet.google.com/ffp-craj-bhk', '_blank');
+        history.back();
       } else {
         location.replace('/church/install-app');
       }
