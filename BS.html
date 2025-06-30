@@ -21,28 +21,33 @@
 </html>
  -->
 
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Bible Study - Church At Guntur</title>
 
-  <!-- Essential OG meta tags for social preview -->
-  <meta property="og:title" content="Bible Study - Church At Guntur">
-  <meta property="og:description" content="Join for Bible Study at 8 PM.">
-  <meta property="og:image" content="https://i.ibb.co/jbkDzKx/bible-study-11zon.jpg">
-  <meta property="og:url" content="https://melam.rahul">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Melam Rahul">
-  <meta name="twitter:card" content="summary_large_image">
+  <!-- OG tags for WhatsApp preview -->
+  <meta property="og:title" content="Bible Study - Church At Guntur" />
+  <meta property="og:description" content="Join Bible Study at 8 PM. Install the app to attend." />
+  <meta property="og:image" content="https://church-at-guntur.github.io/church/Icon512.jpg" />
+  <meta property="og:url" content="https://church-at-guntur.github.io/online/bs.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Fast redirect logic -->
   <script>
     (function () {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      location.replace(isStandalone
-        ? 'https://meet.google.com/ffp-craj-bhk'
-        : '/church/install-app');
+      const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                          navigator.standalone === true ||
+                          document.referrer.startsWith('android-app://');
+
+      if (isInstalled) {
+        location.replace('https://meet.google.com/ffp-craj-bhk');
+      } else {
+        location.replace('/church/install-app');
+      }
     })();
   </script>
 </head>
