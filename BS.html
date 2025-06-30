@@ -40,11 +40,11 @@
   <script>
     (function () {
       const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || document.referrer.startsWith('android-app://');
-      if (isInstalled) {
+      if (!isInstalled) {
+        location.replace('/church/install-app');
+      } else {
         window.open('https://meet.google.com/ffp-craj-bhk', '_blank');
         history.back();
-      } else {
-        location.replace('/church/BS');
       }
     })();
   </script>
