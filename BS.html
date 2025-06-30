@@ -27,7 +27,6 @@
   <meta charset="UTF-8" />
   <title>Bible Study - Church At Guntur</title>
 
-  <!-- OG tags for WhatsApp preview -->
   <meta property="og:title" content="Bible Study - Church At Guntur" />
   <meta property="og:description" content="Join Bible Study at 8 PM. Install the app to attend." />
   <meta property="og:image" content="https://church-at-guntur.github.io/church/Icon512.jpg" />
@@ -37,49 +36,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script>
-(async function () {
-  let isInstalled = false;
+    (async function () {
+      let isPWAInstalled = false; // Renamed for clarity
 
-  // Detect if page is running inside a PWA window
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true || // iOS
-    document.referrer.startsWith('android-app://'); // Android
+      // Define the exact URL for your PWA's manifest.json
+      // This MUST match the 'url' property in your 'related_applications' in manifest.json
+      const pwaManifestUrl = 'https://church-at-guntur.github.io/church/app/manifest.json';
 
-  if (isStandalone) {
-    isInstalled = true;
-  }
+      // --- Step 1: Check using getInstalledRelatedApps() first (most precise for PWA) ---
+      if ('getInstalledRelatedApps' in navigator) {
+        try {
+          const apps = await navigator.getInstalledRelatedApps();
+          isPWAInstalled = apps.some(app =>
+            app.platform === 'webapp' &&
+            app.url === pwaManifestUrl // Use strict equality for precise match
+          );
+        } catch (e) {
+          console.warn('Error checking getInstalledRelatedApps:', e);
+          // If an error occurs, we assume it's not detected via this API and fall through to other checks.
+        }
+      }
 
-  // If not running in standalone, check if the app is installed using getInstalledRelatedApps
-  if (!isInstalled && 'getInstalledRelatedApps' in navigator) {
-    try {
-      const apps = await navigator.getInstalledRelatedApps();
-      isInstalled = apps.some(app =>
-        app.platform === 'webapp' &&
-        app.url.includes('/church/app/manifest.json') // adjust path if needed
-      );
-    } catch (e) {
-      console.warn('Related apps check failed:', e);
-    }
-  }
+      // --- Step 2: Fallback to display-mode checks if not detected by getInstalledRelatedApps ---
+      // This is crucial for older installations and browsers without getInstalledRelatedApps support.
+      if (!isPWAInstalled) {
+        const isStandaloneMode =
+          window.matchMedia('(display-mode: standalone)').matches ||
+          window.navigator.standalone === true; // iOS-specific standalone check
 
-  if (isInstalled) {
-    // App is installed — open Google Meet in a new tab
-    const link = document.createElement('a');
-    link.href = 'https://meet.google.com/ffp-craj-bhk';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
+        const isLaunchedFromAndroidApp = document.referrer.startsWith('android-app://');
 
-    // Optionally return to previous page after short delay
-    setTimeout(() => history.back(), 500);
-  } else {
-    // App is not installed — redirect to install instructions
-    location.replace('/online/install-app');
-  }
-})();
-</script>
+        // Consider it "installed" if it's running in an app-like environment
+        if (isStandaloneMode || isLaunchedFromAndroidApp) {
+          isPWAInstalled = true;
+        }
+      }
+
+      // --- Step 3: Act based on installation status ---
+      if (isPWAInstalled) {
+        // App is installed or running in standalone mode — open Google Meet in a new tab
+        const link = document.createElement('a');
+        link.href = 'https://meet.google.com/ffp-craj-bhk';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer'; // Recommended for security when using _blank
+        document.body.appendChild(link);
+        link.click(); // Programmatically click the link to open a new tab
+
+        // Optionally, return to the previous page after a short delay.
+        // This gives the new tab a moment to open before the current tab navigates away.
+        // If you want to force the user back to the PWA (start_url), consider:
+        // window.location.href = '/church/app';
+        setTimeout(() => history.back(), 500); // 500ms delay
+      } else {
+        // App is not installed — redirect to install instructions
+        location.replace('/online/install-app');
+      }
+    })();
+  </script>
 </head>
 <body></body>
 </html>
